@@ -1,0 +1,46 @@
+
+name: CI/CD Security Scan
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-scan:
+    name: Build Docker Image and Scan for Vulnerabilities
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: my-secure-app:latest
+
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          scan-type: image
+          image-ref: my-secure-app:latest
+          severity: HIGH,CRITICAL
+          vuln-type: os,library
+          format: table
+          output: trivy-results.txt
+          exit-code: '1'
+
+      - name: Upload Trivy scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-scan-results
+          path: trivy-results.txt
+          if-no-files-found: warn
