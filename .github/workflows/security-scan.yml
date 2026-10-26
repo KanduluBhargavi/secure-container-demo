@@ -7,35 +7,35 @@ on:
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
-steps:
+    steps:
     - name: Checkout code
       uses: actions/checkout@v4
-- name: Set up Docker Buildx
+    - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-- name: Build Docker image
+    - name: Build Docker image
       id: docker_build
       uses: docker/build-push-action@v5
       with:
-        context: .
-        push: false # We are not pushing to a registry in this example
-        tags: my-secure-app:latest
-        load: true # Load the image into Docker for Trivy to scan
-- name: Install Trivy
+            context: .
+            push: false # We are not pushing to a registry in this example
+            tags: my-secure-app:latest
+            load: true # Load the image into Docker for Trivy to scan
+    - name: Install Trivy
       uses: aquasecurity/trivy-action@master
       with:
-        # Trivy configuration
-        scan-args: '--severity HIGH,CRITICAL --exit-code 1'
-        # Image to scan
-        image-ref: 'my-secure-app:latest'
-        # Format of output
-        format: 'table'
-        # Output file
-        output: 'trivy-results.txt'
-        # Ignore specific vulnerabilities (optional)
-        # ignore-unfixed: true
-        # vuln-type: null,app
-- name: Upload Trivy scan results
+            # Trivy configuration
+            scan-args: '--severity HIGH,CRITICAL --exit-code 1'
+            # Image to scan
+            image-ref: 'my-secure-app:latest'
+            # Format of output
+            format: 'table'
+            # Output file
+            output: 'trivy-results.txt'
+            # Ignore specific vulnerabilities (optional)
+            # ignore-unfixed: true
+            # vuln-type: null,app
+    - name: Upload Trivy scan results
       uses: actions/upload-artifact@v4
       with:
-        name: trivy-scan-results
-        path: trivy-results.txt
+            name: trivy-scan-results
+            path: trivy-results.txt
