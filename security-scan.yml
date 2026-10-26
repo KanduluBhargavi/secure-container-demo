@@ -1,17 +1,14 @@
+
 name: CI/CD Security Scan
 
-'on':
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+on: [push, pull_request, workflow_dispatch]
 
 permissions:
   contents: read
 
 jobs:
   build-and-scan:
+    name: Build Docker Image and Scan for Vulnerabilities
     runs-on: ubuntu-latest
 
     steps:
@@ -30,7 +27,6 @@ jobs:
           tags: my-secure-app:latest
 
       - name: Scan Docker image with Trivy
-        id: trivy-scan
         uses: aquasecurity/trivy-action@0.36.0
         with:
           scan-type: image
